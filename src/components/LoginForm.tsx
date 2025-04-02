@@ -20,11 +20,11 @@ import { useForm } from "react-hook-form"
 const formSchema = z.object({
   email: z
     .string()
-    .min(2, { message: "Username must be at least 2 characters.", })
+    .min(4, { message: "Username must be at least 2 characters.", })
     .email({ message: "Invalid email address." }),
   password: z
     .string()
-    .min(2, { message: "Password must be at least 2 characters.", }),
+    .min(8, { message: "Password must be at least 2 characters.", }),
 })
 
 const LoginForm = () => {
@@ -45,9 +45,31 @@ const LoginForm = () => {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+    setLoading(true);
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ values }),
+      });
+
+      console.log(response);
+      const data = await response.json();
+      console.log(data);
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Nieprawidłowy email lub hasło');
+      }
+
+      // Login successful, redirect to dashboard
+      router.push('/dashboard');
+      // router.refresh(); // Refresh server components
+    } catch (error) {
+      console.error('Login error:', error);
+      setError(error instanceof Error ? error.message : 'Wystąpił błąd podczas logowania');
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {

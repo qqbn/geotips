@@ -21,11 +21,11 @@ const formSchema = z.object({
     lastname: z.string().min(2, { message: "Lastname must be at least 2 characters.", }),
     email: z
         .string()
-        .min(2, { message: "Username must be at least 2 characters.", })
+        .min(4, { message: "Email must be at least 4 characters.", })
         .email({ message: "Invalid email address." }),
     password: z
         .string()
-        .min(6, { message: "Password must be at least 6 characters.", }),
+        .min(8, { message: "Password must be at least 8 characters.", }),
 })
 
 const RegisterForm = () => {
@@ -48,9 +48,33 @@ const RegisterForm = () => {
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
         console.log(values)
+        setLoading(true);
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ values }),
+            });
+
+            console.log(response);
+            const data = await response.json();
+            console.log(data);
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Nieprawidłowy email lub hasło');
+            }
+
+            // Login successful, redirect to dashboard
+            router.push('/dashboard');
+            // router.refresh(); // Refresh server components
+        } catch (error) {
+            console.error('Login error:', error);
+            setError(error instanceof Error ? error.message : 'Wystąpił błąd podczas logowania');
+        } finally {
+            setLoading(false);
+        }
+
     }
 
     useEffect(() => {
@@ -60,35 +84,6 @@ const RegisterForm = () => {
         }
     }, [searchParams]);
 
-    // async function handleSubmit(e: React.FormEvent) {
-    //   e.preventDefault();
-    //   setLoading(true);
-    //   setError('');
-    //   setSuccessMessage('');
-
-    //   try {
-    //     const response = await fetch('/api/auth/login', {
-    //       method: 'POST',
-    //       headers: { 'Content-Type': 'application/json' },
-    //       body: JSON.stringify({ email, password }),
-    //     });
-
-    //     const data = await response.json();
-
-    //     if (!response.ok) {
-    //       throw new Error(data.message || 'Nieprawidłowy email lub hasło');
-    //     }
-
-    //     // Login successful, redirect to dashboard
-    //     router.push('/dashboard');
-    //     router.refresh(); // Refresh server components
-    //   } catch (error) {
-    //     console.error('Login error:', error);
-    //     setError(error instanceof Error ? error.message : 'Wystąpił błąd podczas logowania');
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // }
 
     return (
         <Card className=' mx-auto mt-10 p-6 bg-white rounded-lg shadow-md mx-auto max-w-[600px]'>

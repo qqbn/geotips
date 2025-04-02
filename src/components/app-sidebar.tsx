@@ -1,5 +1,5 @@
+'use client'
 import { Calendar, Home, Inbox, Search, Settings, ChevronUp, User2, LogOut } from "lucide-react"
-
 import {
     Sidebar,
     SidebarContent,
@@ -46,6 +46,23 @@ const items = [
 ]
 
 export function AppSidebar() {
+    const router = useRouter();
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (!response.ok) {
+                throw new Error('Failed to logout');
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            router.push('/auth/login');
+        }
+    }
+
     return (
         <Sidebar>
             <SidebarContent>
@@ -85,7 +102,7 @@ export function AppSidebar() {
                                     <Settings />
                                     <span>Account</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleLogout}>
                                     <LogOut />
                                     <span>Sign out</span>
                                 </DropdownMenuItem>
