@@ -1,5 +1,6 @@
 'use client'
-import { Calendar, Home, Inbox, Search, Settings, ChevronUp, User2, LogOut } from "lucide-react"
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Calendar, Home, Inbox, Search, Settings, ChevronUp, User2, LogOut, List } from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
@@ -42,6 +43,11 @@ const items = [
         title: "Search",
         url: "#",
         icon: Search,
+    },
+    {
+        title: "Quizes",
+        url: "/dashboard/quizes",
+        icon: List,
     },
 ]
 
@@ -100,7 +106,7 @@ export function AppSidebar() {
                             >
                                 <DropdownMenuItem>
                                     <Settings />
-                                    <span>Account</span>
+                                    <a href="/account">Account</a>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={handleLogout}>
                                     <LogOut />
